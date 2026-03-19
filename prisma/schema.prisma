@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Applicant {
+  applicantId        Int      @id @default(autoincrement())
+  firstName          String
+  lastName           String
+  email              String   @unique
+  username           String   @unique
+  passwordHash       String
+  accountCreatedDate DateTime @default(now())
+  resumes            Resume[]
+}
+
+model Resume {
+  resumeId      Int      @id @default(autoincrement())
+  fileName      String
+  fileType      String
+  uploadDate    DateTime @default(now())
+  resumeText    String
+  versionNumber Int      @default(1)
+  applicantId   Int
+  applicant     Applicant @relation(fields: [applicantId], references: [applicantId])
+  reviews       Review[]
+  skills        ResumeSkill[]
+}
+
+model Skill {
+  skillId       Int           @id @default(autoincrement())
+  skillName     String
+  skillCategory String
+  resumes       ResumeSkill[]
+  jobPostings   JobSkill[]
+}
+
+model ResumeSkill {
+  resumeId Int
+  skillId  Int
+  resume   Resume @relation(fields: [resumeId], references: [resumeId])
+  skill    Skill  @relation(fields: [skillId], references: [skillId])
+
+  @@id([resumeId, skillId])
+}
+
+model Review {
+  reviewId            Int        @id @default(autoincrement())
+  reviewDate          DateTime   @default(now())
+  overallScore        Float
+  feedbackText        String
+  recommendationLevel String
+  resumeId            Int
+  resume              Resume     @relation(fields: [resumeId], references: [resumeId])
+  jobPostingId        Int?
+  jobPosting          JobPosting? @relation(fields: [jobPostingId], references: [jobId])
+}
+
+model JobPosting {
+  jobId          Int        @id @default(autoincrement())
+  jobTitle       String
+  jobDescription String
+  companyName    String
+  datePosted     DateTime   @default(now())
+  hiringUserId   Int
+  hiringUser     HiringUser @relation(fields: [hiringUserId], references: [userId])
+  skills         JobSkill[]
+  reviews        Review[]
+}
+
+model JobSkill {
+  jobId      Int
+  skillId    Int
+  job        JobPosting @relation(fields: [jobId], references: [jobId])
+  skill      Skill      @relation(fields: [skillId], references: [skillId])
+
+  @@id([jobId, skillId])
+}
+
+model HiringUser {
+  userId      Int          @id @default(autoincrement())
+  name        String
+  email       String       @unique
+  role        String
+  jobPostings JobPosting[]
+}
