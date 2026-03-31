@@ -27,7 +27,7 @@ jest.mock("next/server", () => ({
 }));
 
 import { GET, POST } from "@/app/api/resumes/route";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { analyzeResume } from "@/lib/ai";
 
@@ -126,7 +126,7 @@ describe("POST /api/resumes", () => {
   it("returns 400 when no file is provided", async () => {
     const request = makePostRequest({ file: null });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedJson).toHaveBeenCalledWith(
       { error: "No file provided" },
@@ -138,7 +138,7 @@ describe("POST /api/resumes", () => {
     const file = makeFile("resume.exe", "application/octet-stream", "content");
     const request = makePostRequest({ file });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedJson).toHaveBeenCalledWith(
       { error: "Only PDF, TXT, DOC, and DOCX files are supported" },
@@ -150,7 +150,7 @@ describe("POST /api/resumes", () => {
     const file = makeFile("resume.txt", "text/plain", "   ");
     const request = makePostRequest({ file });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedJson).toHaveBeenCalledWith(
       { error: "Could not extract text from the file" },
@@ -162,7 +162,7 @@ describe("POST /api/resumes", () => {
     const file = makeFile("resume.txt", "text/plain", "John Doe\nSoftware Engineer");
     const request = makePostRequest({ file });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedAnalyzeResume).toHaveBeenCalledWith(
       "John Doe\nSoftware Engineer",
@@ -187,7 +187,7 @@ describe("POST /api/resumes", () => {
     const file = makeFile("resume.pdf", "application/pdf", "%PDF-content");
     const request = makePostRequest({ file });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockPdfParse).toHaveBeenCalled();
     expect(mockedAnalyzeResume).toHaveBeenCalledWith(
@@ -200,7 +200,7 @@ describe("POST /api/resumes", () => {
     const file = makeFile("resume.doc", "application/msword", "DOC content here");
     const request = makePostRequest({ file });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedAnalyzeResume).toHaveBeenCalledWith("DOC content here", undefined);
   });
@@ -213,7 +213,7 @@ describe("POST /api/resumes", () => {
     );
     const request = makePostRequest({ file });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedAnalyzeResume).toHaveBeenCalledWith("DOCX content here", undefined);
   });
@@ -227,7 +227,7 @@ describe("POST /api/resumes", () => {
     const file = makeFile("resume.txt", "text/plain", "John Doe resume");
     const request = makePostRequest({ file, jobPostingId: "5" });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedJobPostingFindUnique).toHaveBeenCalledWith({
       where: { jobId: 5 },
@@ -243,7 +243,7 @@ describe("POST /api/resumes", () => {
     const file = makeFile("resume.txt", "text/plain", "resume content");
     const request = makePostRequest({ file, jobPostingId: "999" });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedAnalyzeResume).toHaveBeenCalledWith("resume content", undefined);
   });
@@ -253,7 +253,7 @@ describe("POST /api/resumes", () => {
     const file = makeFile("resume.txt", "text/plain", "resume content");
     const request = makePostRequest({ file });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedSkillCreate).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -267,7 +267,7 @@ describe("POST /api/resumes", () => {
     const file = makeFile("resume.txt", "text/plain", "resume content");
     const request = makePostRequest({ file });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedSkillCreate).not.toHaveBeenCalled();
     expect(mockedResumeSkillCreate).toHaveBeenCalledWith(
@@ -280,7 +280,7 @@ describe("POST /api/resumes", () => {
     const file = makeFile("resume.txt", "text/plain", "resume content");
     const request = makePostRequest({ file });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedJson).toHaveBeenCalledWith(
       { error: "Failed to process resume" },
