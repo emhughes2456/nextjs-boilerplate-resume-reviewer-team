@@ -19,7 +19,7 @@ jest.mock("next/server", () => ({
 }));
 
 import { GET, POST } from "@/app/api/jobs/route";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
 const mockedJson = NextResponse.json as jest.Mock;
@@ -115,7 +115,7 @@ describe("POST /api/jobs", () => {
       companyName: "Acme",
     });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedJson).toHaveBeenCalledWith(
       { error: "jobTitle, jobDescription, and companyName are required" },
@@ -126,7 +126,7 @@ describe("POST /api/jobs", () => {
   it("returns 400 when jobDescription is missing", async () => {
     const request = makeRequest({ jobTitle: "Dev", companyName: "Acme" });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedJson).toHaveBeenCalledWith(
       { error: "jobTitle, jobDescription, and companyName are required" },
@@ -140,7 +140,7 @@ describe("POST /api/jobs", () => {
       jobDescription: "Build things",
     });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedJson).toHaveBeenCalledWith(
       { error: "jobTitle, jobDescription, and companyName are required" },
@@ -155,7 +155,7 @@ describe("POST /api/jobs", () => {
       companyName: "TechCorp",
     });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedJobCreate).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -176,7 +176,7 @@ describe("POST /api/jobs", () => {
       companyName: "TechCorp",
     });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedJson).toHaveBeenCalledWith(
       expect.objectContaining({ jobId: 10 }),
@@ -195,7 +195,7 @@ describe("POST /api/jobs", () => {
       ],
     });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedSkillUpsert).toHaveBeenCalledTimes(2);
     expect(mockedSkillUpsert).toHaveBeenCalledWith(
@@ -218,7 +218,7 @@ describe("POST /api/jobs", () => {
       companyName: "Acme",
     });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedSkillUpsert).not.toHaveBeenCalled();
     expect(mockedJobSkillCreate).not.toHaveBeenCalled();
@@ -232,7 +232,7 @@ describe("POST /api/jobs", () => {
       skills: [],
     });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedSkillUpsert).not.toHaveBeenCalled();
   });
@@ -245,7 +245,7 @@ describe("POST /api/jobs", () => {
       companyName: "Acme",
     });
 
-    await POST(request as any);
+    await POST(request as unknown as NextRequest);
 
     expect(mockedJson).toHaveBeenCalledWith(
       { error: "Failed to create job posting" },
