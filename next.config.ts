@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: [
     "pdf-parse",
     "better-sqlite3",
+    "@prisma/client",
     "@prisma/adapter-better-sqlite3",
   ],
 };

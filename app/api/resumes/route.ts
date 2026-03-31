@@ -3,7 +3,8 @@ import { prisma } from "@/lib/db";
 import { analyzeResume } from "@/lib/ai";
 // pdf-parse is CommonJS — import dynamically to avoid ESM issues with Next.js
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require("pdf-parse");
+const _pdfParse = require("pdf-parse");
+const pdfParse = _pdfParse.default ?? _pdfParse;
 
 // Hardcoded applicant ID (mock auth — real auth would come from session)
 const MOCK_APPLICANT_ID = 1;
