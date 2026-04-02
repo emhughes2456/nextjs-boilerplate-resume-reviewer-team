@@ -35,9 +35,8 @@ Always respond with valid JSON matching this exact structure:
     : `Please analyze this resume:\n\nRESUME:\n${resumeText}`;
 
   const stream = client.messages.stream({
-    model: "claude-opus-4-6",
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 2048,
-    thinking: { type: "adaptive" },
     system: systemPrompt,
     messages: [{ role: "user", content: userMessage }],
   });
@@ -52,8 +51,10 @@ Always respond with valid JSON matching this exact structure:
     }
   }
 
-  // Strip markdown code fences if present
+  // Strip markdown code fences if present, then extract just the JSON object
   jsonText = jsonText.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
+  const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+  if (jsonMatch) jsonText = jsonMatch[0];
 
   const analysis = JSON.parse(jsonText) as ResumeAnalysis;
   return analysis;

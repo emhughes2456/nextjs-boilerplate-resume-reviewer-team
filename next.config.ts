@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   serverExternalPackages: [
     "pdf-parse",
+    "pdfjs-dist",
     "better-sqlite3",
     "@prisma/client",
     "@prisma/adapter-better-sqlite3",

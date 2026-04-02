@@ -1,10 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { analyzeResume } from "@/lib/ai";
-// pdf-parse is CommonJS — import dynamically to avoid ESM issues with Next.js
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const _pdfParse = require("pdf-parse");
-const pdfParse = _pdfParse.default ?? _pdfParse;
+function parsePdf(buffer: Buffer): Promise<{ text: string }> {
+  return new Promise((resolve, reject) => {
+    const { spawn } = require("child_process") as typeof import("child_process");
+    const path = require("path") as typeof import("path");
+    const scriptPath = path.join(process.cwd(), "scripts/pdf-parser.js");
+    const child = spawn(process.execPath, [scriptPath]);
+
+    let output = "";
+    let errorOutput = "";
+    child.stdout.on("data", (data: Buffer) => (output += data.toString()));
+    child.stderr.on("data", (data: Buffer) => (errorOutput += data.toString()));
+    child.on("close", (code: number) => {
+      if (code === 0) resolve({ text: output });
+      else reject(new Error(errorOutput || "PDF parsing failed"));
+    });
+
+    child.stdin.write(buffer);
+    child.stdin.end();
+  });
+}
 
 // Hardcoded applicant ID (mock auth — real auth would come from session)
 const MOCK_APPLICANT_ID = 1;
@@ -60,7 +76,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
 
     if (file.type === "application/pdf") {
-      const parsed = await pdfParse(buffer);
+      const parsed = await parsePdf(buffer);
       resumeText = parsed.text;
     } else {
       resumeText = buffer.toString("utf-8");
