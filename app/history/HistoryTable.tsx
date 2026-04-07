@@ -25,16 +25,16 @@ interface Review {
 function ScoreBadge({ score, level }: { score: number; level: string }) {
   const badgeColor =
     level === "Accept"
-      ? "bg-green-100 text-green-700"
+      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
       : level === "Improve"
-      ? "bg-orange-100 text-orange-700"
-      : "bg-red-100 text-red-700";
+      ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
+      : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
   const scoreColor =
     level === "Accept"
-      ? "text-green-600"
+      ? "text-green-600 dark:text-green-400"
       : level === "Improve"
-      ? "text-orange-500"
-      : "text-red-500";
+      ? "text-orange-500 dark:text-orange-400"
+      : "text-red-500 dark:text-red-400";
   return (
     <div className="flex items-center gap-2">
       <span className={`font-semibold text-sm ${scoreColor}`}>{score}%</span>
@@ -58,15 +58,15 @@ function ResumeModal({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col mx-4"
+        className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col mx-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <div>
-            <h2 className="text-base font-semibold text-gray-900">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
               {review.resume.fileName}
             </h2>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               Uploaded{" "}
               {new Date(review.resume.uploadDate).toLocaleDateString("en-US", {
                 year: "numeric",
@@ -77,7 +77,7 @@ function ResumeModal({
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             aria-label="Close"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,7 +86,7 @@ function ResumeModal({
           </button>
         </div>
         <div className="overflow-y-auto px-6 py-4 flex-1">
-          <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">
+          <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-sans leading-relaxed">
             {review.resume.resumeText}
           </pre>
         </div>
@@ -100,23 +100,23 @@ export default function HistoryTable({ reviews }: { reviews: Review[] }) {
 
   return (
     <>
-      <div className="divide-y divide-gray-100">
+      <div className="divide-y divide-gray-100 dark:divide-gray-700">
         {reviews.map((review) => (
           <div
             key={review.reviewId}
-            className="grid grid-cols-12 gap-4 px-5 py-4 items-center hover:bg-gray-50 transition-colors"
+            className="grid grid-cols-12 gap-4 px-5 py-4 items-center hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
           >
             <div className="col-span-4 flex items-center gap-3">
-              <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-9 h-9 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-blue-400 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                   {review.resume.fileName}
                 </p>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   Uploaded{" "}
                   {new Date(review.resume.uploadDate).toLocaleDateString()}
                 </p>
@@ -125,15 +125,15 @@ export default function HistoryTable({ reviews }: { reviews: Review[] }) {
             <div className="col-span-3 min-w-0">
               {review.jobPosting ? (
                 <div>
-                  <p className="text-sm text-gray-700 truncate">
+                  <p className="text-sm text-gray-700 dark:text-gray-300 truncate">
                     {review.jobPosting.jobTitle}
                   </p>
-                  <p className="text-xs text-gray-400 truncate">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                     {review.jobPosting.companyName}
                   </p>
                 </div>
               ) : (
-                <span className="text-xs text-gray-400">General Review</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">General Review</span>
               )}
             </div>
             <div className="col-span-2">
@@ -143,7 +143,7 @@ export default function HistoryTable({ reviews }: { reviews: Review[] }) {
               />
             </div>
             <div className="col-span-2">
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
                 {new Date(review.reviewDate).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "short",
@@ -157,7 +157,7 @@ export default function HistoryTable({ reviews }: { reviews: Review[] }) {
                 onClick={() => setSelectedReview(review)}
                 className="group relative"
               >
-                <svg className="w-4 h-4 text-gray-400 hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
