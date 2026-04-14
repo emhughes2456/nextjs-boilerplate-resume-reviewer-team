@@ -19,6 +19,10 @@ jest.mock("@/lib/ai", () => ({
 
 jest.mock("pdf-parse", () => jest.fn());
 
+jest.mock("mammoth", () => ({
+  extractRawText: jest.fn(),
+}));
+
 jest.mock("next/server", () => ({
   NextResponse: {
     json: jest.fn((data, init) => ({ data, status: init?.status ?? 200 })),
@@ -43,6 +47,8 @@ const mockedApplicantUpsert = prisma.applicant.upsert as jest.Mock;
 const mockedAnalyzeResume = analyzeResume as jest.Mock;
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const mockPdfParse = require("pdf-parse") as jest.Mock;
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const mockMammoth = require("mammoth") as { extractRawText: jest.Mock };
 
 const sampleAnalysis = {
   overallScore: 80,
@@ -141,7 +147,7 @@ describe("POST /api/resumes", () => {
     await POST(request as unknown as NextRequest);
 
     expect(mockedJson).toHaveBeenCalledWith(
-      { error: "Only PDF, TXT, DOC, and DOCX files are supported" },
+      { error: "Only PDF, TXT, and DOCX files are supported" },
       { status: 400 }
     );
   });
@@ -196,26 +202,31 @@ describe("POST /api/resumes", () => {
     );
   });
 
-  it("accepts DOC files by MIME type", async () => {
+  it("rejects DOC files with 400", async () => {
     const file = makeFile("resume.doc", "application/msword", "DOC content here");
     const request = makePostRequest({ file });
 
     await POST(request as unknown as NextRequest);
 
-    expect(mockedAnalyzeResume).toHaveBeenCalledWith("DOC content here", undefined);
+    expect(mockedJson).toHaveBeenCalledWith(
+      { error: "Only PDF, TXT, and DOCX files are supported" },
+      { status: 400 }
+    );
   });
 
-  it("accepts DOCX files by MIME type", async () => {
+  it("extracts text from DOCX using mammoth", async () => {
+    mockMammoth.extractRawText.mockResolvedValue({ value: "Extracted DOCX text" });
     const file = makeFile(
       "resume.docx",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "DOCX content here"
+      "binary-docx-content"
     );
     const request = makePostRequest({ file });
 
     await POST(request as unknown as NextRequest);
 
-    expect(mockedAnalyzeResume).toHaveBeenCalledWith("DOCX content here", undefined);
+    expect(mockMammoth.extractRawText).toHaveBeenCalled();
+    expect(mockedAnalyzeResume).toHaveBeenCalledWith("Extracted DOCX text", undefined);
   });
 
   it("fetches job description when jobPostingId is provided", async () => {

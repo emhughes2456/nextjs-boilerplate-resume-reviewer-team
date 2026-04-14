@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { analyzeResume } from "@/lib/ai";
+import mammoth from "mammoth";
 function parsePdf(buffer: Buffer): Promise<{ text: string }> {
   return new Promise((resolve, reject) => {
     const { spawn } = require("child_process") as typeof import("child_process");
@@ -60,12 +61,11 @@ export async function POST(request: NextRequest) {
     const allowedTypes = [
       "application/pdf",
       "text/plain",
-      "application/msword",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
-        { error: "Only PDF, TXT, DOC, and DOCX files are supported" },
+        { error: "Only PDF, TXT, and DOCX files are supported" },
         { status: 400 }
       );
     }
@@ -78,6 +78,12 @@ export async function POST(request: NextRequest) {
     if (file.type === "application/pdf") {
       const parsed = await parsePdf(buffer);
       resumeText = parsed.text;
+    } else if (
+      file.type ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ) {
+      const result = await mammoth.extractRawText({ buffer });
+      resumeText = result.value;
     } else {
       resumeText = buffer.toString("utf-8");
     }
