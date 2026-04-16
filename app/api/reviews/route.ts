@@ -10,7 +10,11 @@ export async function GET() {
         resume: { applicantId: MOCK_APPLICANT_ID },
       },
       include: {
-        resume: true,
+        resume: {
+          include: {
+            skills: { include: { skill: true } },
+          },
+        },
         jobPosting: true,
       },
       orderBy: { reviewDate: "desc" },
