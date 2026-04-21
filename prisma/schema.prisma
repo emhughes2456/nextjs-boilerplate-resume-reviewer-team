@@ -24,6 +24,7 @@ model Resume {
   fileType      String
   uploadDate    DateTime @default(now())
   resumeText    String
+  filePath      String?
   versionNumber Int      @default(1)
   applicantId   Int
   applicant     Applicant @relation(fields: [applicantId], references: [applicantId])
@@ -54,6 +55,8 @@ model Review {
   overallScore        Float
   feedbackText        String
   recommendationLevel String
+  strengths           String  @default("[]")
+  improvements        String  @default("[]")
   resumeId            Int
   resume              Resume     @relation(fields: [resumeId], references: [resumeId])
   jobPostingId        Int?

@@ -126,7 +126,7 @@ export default function UploadPage() {
               ref={fileInputRef}
               type="file"
               className="hidden"
-              accept=".pdf,.txt,.doc,.docx"
+              accept=".pdf,.txt,.docx"
               onChange={(e) => {
                 const f = e.target.files?.[0];
                 if (f) setFile(f);
@@ -162,7 +162,7 @@ export default function UploadPage() {
                     Drag & drop your resume here
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    or click to browse — PDF, TXT, DOC, DOCX
+                    or click to browse — PDF, TXT, DOCX
                   </p>
                 </div>
               </div>
