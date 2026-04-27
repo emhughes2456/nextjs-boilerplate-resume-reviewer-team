@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { analyzeResume } from "@/lib/ai";
+import { matchKeywords } from "@/lib/Matcher";
 import mammoth from "mammoth";
 function parsePdf(buffer: Buffer): Promise<{ text: string }> {
   return new Promise((resolve, reject) => {
@@ -130,6 +131,11 @@ export async function POST(request: NextRequest) {
 
     // Run AI analysis
     const analysis = await analyzeResume(resumeText, jobDescription);
+    const keywordResult = jobDescription
+  ? matchKeywords(resumeText, jobDescription)
+  : null;
+
+console.log("KEYWORD RESULT:", keywordResult);
 
     // Save skills to database
     for (const skill of analysis.skills) {
@@ -170,6 +176,7 @@ export async function POST(request: NextRequest) {
           improvements: analysis.improvements,
           skills: analysis.skills,
         },
+        keywordMatch: keywordResult, // 👈 ADD THIS
       },
       { status: 201 }
     );
