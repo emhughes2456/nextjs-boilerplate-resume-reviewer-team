@@ -24,6 +24,7 @@ dev.db
 # misc
 .DS_Store
 *.pem
+*.db
 
 # debug
 npm-debug.log*
@@ -42,3 +43,6 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+
+# uploaded resume files
+/uploads

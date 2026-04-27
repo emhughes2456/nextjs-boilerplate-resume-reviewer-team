@@ -7,12 +7,16 @@ interface Review {
   overallScore: number;
   feedbackText: string;
   recommendationLevel: string;
+  strengths: string;
+  improvements: string;
   resume: {
     resumeId: number;
     fileName: string;
     fileType: string;
     uploadDate: string;
     resumeText: string;
+    filePath: string | null;
+    skills: Array<{ skill: { skillId: number; skillName: string; skillCategory: string } }>;
   };
   jobPosting: {
     jobId: number;

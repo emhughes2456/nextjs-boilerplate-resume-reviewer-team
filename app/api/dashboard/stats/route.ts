@@ -28,7 +28,7 @@ export async function GET() {
 
     const avgScore =
       reviews.length > 0
-        ? reviews.reduce((sum, r) => sum + r.overallScore, 0) / reviews.length
+        ? reviews.reduce((sum: number, r) => sum + r.overallScore, 0) / reviews.length
         : 0;
 
     const accepted = reviews.filter(

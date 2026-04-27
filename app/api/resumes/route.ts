@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { analyzeResume } from "@/lib/ai";
 import { matchKeywords } from "@/lib/Matcher";
 import mammoth from "mammoth";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
 function parsePdf(buffer: Buffer): Promise<{ text: string }> {
   return new Promise((resolve, reject) => {
     const { spawn } = require("child_process") as typeof import("child_process");
@@ -129,6 +131,21 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Save original file to disk
+    try {
+      const uploadsDir = path.join(process.cwd(), "uploads");
+      await mkdir(uploadsDir, { recursive: true });
+      const storedName = `${resume.resumeId}_${file.name}`;
+      await writeFile(path.join(uploadsDir, storedName), buffer);
+      await prisma.resume.update({
+        where: { resumeId: resume.resumeId },
+        data: { filePath: storedName },
+      });
+    } catch (err) {
+      console.error("Failed to save file to disk:", err);
+      // Non-fatal — resume and review are already saved
+    }
+
     // Run AI analysis
     const analysis = await analyzeResume(resumeText, jobDescription);
     const keywordResult = jobDescription
@@ -162,6 +179,8 @@ console.log("KEYWORD RESULT:", keywordResult);
         overallScore: analysis.overallScore,
         feedbackText: analysis.feedbackText,
         recommendationLevel: analysis.recommendationLevel,
+        strengths: JSON.stringify(analysis.strengths),
+        improvements: JSON.stringify(analysis.improvements),
         resumeId: resume.resumeId,
         jobPostingId: jobPostingId ? parseInt(jobPostingId) : null,
       },
